@@ -3,7 +3,7 @@ import plotly.express as px
 from PIL import Image
 
 
-labels={'netuid': 'Subnet', 'Emission':'Emission (%)', 'owner_take': 'Daily Owner Earnings (TAO)','owner_take': 'Daily Owner Earnings ($USD)'}
+labels={'netuid': 'Subnet', 'Emission':'Emission (%)', 'owner_take': 'Daily Owner Earnings (TAO)','owner_take_usd': 'Daily Owner Earnings ($USD)'}
 
 @st.cache_data()
 def plot_owner_total_earnings(df, y='owner_take', color='day', title=None):
