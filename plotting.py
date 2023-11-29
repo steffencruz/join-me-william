@@ -5,10 +5,10 @@ from PIL import Image
 
 
 @st.cache_data()
-def plot_owner_total_earnings(df, y='owner_take', color='day'):
+def plot_owner_total_earnings(df, y='owner_take', color='day', title=None):
     return px.bar(df, x='netuid', y=y, color=color, barmode='group',
             color_continuous_scale='BlueRed',
-            title='Total Earnings per Subnet',
+            title=f'Total {title or y} per Subnet',
             labels={'netuid': 'Subnet', 'owner_take': 'Owner Earning (TAO)', 'day': 'Day'},
             width=800, height=600, template='plotly_white')
 

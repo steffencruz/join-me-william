@@ -174,7 +174,7 @@ with tab1:
     )
 
     st.plotly_chart(
-        plotting.plot_owner_total_earnings(df, y=y_mapping[y], color='day'),
+        plotting.plot_owner_total_earnings(df, y=y_mapping[y], title=y, color='day'),
         use_container_width=True
     )
 
