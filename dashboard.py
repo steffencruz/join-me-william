@@ -139,7 +139,7 @@ with tab1:
     sn_emission = df_sn.Emission.values
     sn_owner_take = df_sn.owner_take.values
 
-    ncol2.markdown(f'*Showing metrics for subnet* **{netuid}**')
+    ncol2.markdown(f'*Showing metrics for subnet* **{netuid}** between {df_sn.timestamp.min().round("1d")} and {df_sn.timestamp.max().round("1d")}*')
 
     mcol1, mcol2, mcol3 = st.columns(3)
     mcol1.metric('Emission %', f'{sn_emission[-1]*100:.1f}', delta=f'{(sn_emission[-1]-sn_emission[-2])*100:.1f}')
