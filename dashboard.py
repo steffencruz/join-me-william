@@ -233,9 +233,9 @@ with tab4:
         'sultan': 'data/photos/sultan.jpg',
         'nice': 'data/photos/nice.jpg',
         'chess': 'data/photos/chess.jpg',
-        'strange': 'data/photos/strange.jpeg'
+        'strange': 'data/photos/strange.jpg'
     }
-    photo_choice = st.radio('Choose a time:', ['good', 'nice','chess','strange','spooky'], horizontal=True, index=0)
+    photo_choice = st.radio('Choose a time:', list(photo_choices.keys()), horizontal=True, index=0)
 
     # display image
     st.image(plotting.plot_photo(photo_choices[photo_choice]), use_column_width=True)
