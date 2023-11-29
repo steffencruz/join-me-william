@@ -1,10 +1,14 @@
 import os
 import time
+import torch
 import pandas as pd
 import streamlit as st
 
 import asyncio
 import plotting
+import requests
+import regex
+
 
 _ = """A Dashboard to Serenade William
 
@@ -59,26 +63,29 @@ st.title('Synapse Labs')
 st.markdown('#')
 st.markdown('#')
 
-metagraph = bt.metagraph(0)
-current_block = metagraph.block.item()
+
 
 df = pd.read_csv('data/subnets/0/df.csv')
+df.sort_values(by=['block','timestamp','netuid'], inplace=True)
 blocks = df.block.unique()
-
 last_block = df.block.max()
-
-sn1 = df.loc[df.netuid==1]
-today = df.loc[df.block == last_block].iloc[0]
-sn1_today = today.loc[today.netuid==1]
-
-yesterday = df.loc[df.block == last_block-7200].iloc[0]
-sn1_yesterday = yesterday.loc[yesterday.netuid==1]
 
 # tau symbol
 tao = u"\u03C4"
 
+st.cache_data()
+def get_metagraph(netuid=0):
+    try:
+        return bt.metagraph(netuid)
+    except:
+        class FakeMetagraph:
+            def __init__(self):
+                self.block = torch.tensor(0)
 
+        return FakeMetagraph()
 
+metagraph = get_metagraph()
+current_block = metagraph.block.item()
 
 # with st.sidebar:
 #     st.title('Options')
@@ -119,6 +126,21 @@ tao = u"\u03C4"
 #     smooth = r3c1.slider('Smoothing', min_value=1, max_value=100, value=1, key='sel_churn_smooth')
 #     smooth_agg = r3c2.radio('Smooth Aggregation', ['mean','std','max','min','sum'], horizontal=True, index=0)
 
+def get_token_price():
+    """Get tao price"""
+    resp = requests.get('https://taostats.io')
+    match = regex.search('Price.</label> \\$(?P<price>\\d+.\\d+)',resp.text).groupdict()
+    price = float(match['price'])
+    print(f'Live token price = USD${price:.2f}')
+    return price
+
+token_price = get_token_price()
+
+tlmcol1, tlmcol2, tlmcol3 = st.columns(3)
+tlmcol1.metric(f'Token price: {tao}', f'${token_price:.2f}')
+tlmcol2.metric(f'Current block: ', f'{current_block:,}')
+tlmcol3.metric(f'Daily emission: (US$)', f'${7200*token_price:,.0f}')
+
 
 # add vertical space
 st.markdown('#')
@@ -131,50 +153,65 @@ with tab1:
 
     st.markdown('#')
     st.markdown('#')
-    st.subheader('Subnet Ownership')
-    st.info('**Ownership** *earns 18% of all subnet emissions*')
+    st.header('Subnet Ownership')
+    st.success('**Ownership** *earns 18% of all subnet emissions*')
 
     st.markdown('#')
+
+    st.subheader('Subnet Metrics')
+
+    ncol1, *_ = st.columns(3)
+    netuid = ncol1.selectbox('Select a **subnet**', sorted(df.netuid.unique()), index=1)
+    df_sn = df.loc[df.netuid==netuid]
+    sn_emission = df_sn.Emission.values
+    sn_owner_take = df_sn.owner_take.values
+
+    st.info(f'*Showing metrics for subnet* **{netuid}**')
 
     mcol1, mcol2, mcol3 = st.columns(3)
-    mcol2.metric('Emission %', f'{sn1_today.emission*100:.1f}', delta=f'{(sn1_today.emission-sn1_yesterday.emission)*100:.1f}')
-    mcol3.metric('Earnings', f'{tao}{sn1.earnings.sum():.3f}', delta=f'{tao}{sn1_today.earnings-sn1_yesterday.earnings:.3f}')
+    mcol1.metric('Emission %', f'{sn_emission[-1]*100:.1f}', delta=f'{(sn_emission[-1]-sn_emission[-2])*100:.1f}')
+    mcol2.metric(f'Total earnings ({tao})', f'{tao}{sn_owner_take.sum():.2f}', delta=f'{tao}{sn_owner_take[-1]-sn_owner_take[-2]:.2f}')
+    mcol3.metric(f'Total earnings (US$)', f'{tao}{sn_owner_take.sum()*token_price:,.2f}', delta=f'{tao}{(sn_owner_take[-1]-sn_owner_take[-2])*token_price:,.2f}')
+
+    with st.expander(f'View **raw** data for subnet {netuid}'):
+        st.dataframe(df_sn)
 
     st.markdown('#')
+    st.markdown('#')
+    st.markdown('#')
     
+    st.subheader('Subnet Earnings')
+
+    pcol1, pcol2, pcol3 = st.columns(3)
+
+    x = pcol1.selectbox('**Time axis**', ['block','timestamp','day'], index=1)
+
+    y_mapping = {
+        'Emissions': 'Emission',
+        'Earnings': 'owner_take'
+    }
+
+    y = pcol2.selectbox('**Y axis**', ['Earnings','Emission'], index=0)
+    ntop = pcol3.slider('**Top Subnets**', min_value=1, max_value=32, value=32, key='sel_ntop')
+
     st.plotly_chart(
-        plotting.plot_owner_total_earnings(df, y='owner_take', color='day'),
+        plotting.plot_owner_emission_trends(df, x=x, y=y_mapping[y], color='netuid', ntop=ntop),
         use_container_width=True
     )
 
-    ntop = st.slider('**Top Subnets**', min_value=1, max_value=32, value=32, key='sel_ntop')
-    x = st.selectbox('**Time axis**', ['block','timestamp'], index=0)
-    with st.expander(f'Show **emission** trends for top **{ntop}** subnets'):
+    st.plotly_chart(
+        plotting.plot_owner_total_earnings(df, y=y_mapping[y], color='day'),
+        use_container_width=True
+    )
 
-        st.plotly_chart(
-            plotting.plot_owner_emission_trends(df, time_col=x, y='emission', color='netuid', ntop=ntop),
-            use_container_width=True
-        )
-
-    with st.expander(f'Show **earnings** trends for top **{ntop}** miners'):
-
-        st.plotly_chart(
-            plotting.plot_owner_emission_trends(df, time_col=x, y='owner_take', color='netuid', ntop=ntop),
-            use_container_width=True
-        )
-
-
-    # selected_block = st.selectbox('**Block**', reversed(df_sel.block.unique()), index=0)
-
-    # st.dataframe(df_sel.loc[df_sel['block']==selected_block])
 
 with tab2:
 
     st.markdown('#')
     st.markdown('#')
-    st.subheader('Validator Revenue')
-    st.info('**Activity** *shows the change in stake and emission over time for **validators**, grouped by coldkey*')
-
+    st.header('Validator Revenue')
+    st.success('**Validators** *earn 18% of nominator dividends*')
+    
     # mcol1, mcol2, mcol3 = st.columns(3)
     # mcol2.metric('Emission %', f'{sn1_today.emission*100:.1f}', delta=f'{(sn1_today.emission-sn1_yesterday.emission)*100:.1f}')
     # mcol3.metric('Earnings', f'{tao}{sn1.earnings.sum():.3f}', delta=f'{tao}{sn1_today.earnings-sn1_yesterday.earnings:.3f}')

@@ -1,5 +1,8 @@
 bittensor
 pandas
 plotly
+torch
 streamlit
 tqdm
+watchdog
+regex
