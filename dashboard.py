@@ -127,6 +127,8 @@ with tab1:
     st.success('**Ownership** *earns 18% of all subnet emissions*')
 
     st.markdown('#')
+    st.markdown('#')
+    st.markdown('#')
 
     st.subheader('Subnet Metrics')
 
