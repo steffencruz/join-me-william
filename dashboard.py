@@ -48,11 +48,11 @@ import bittensor as bt
 
 # Set app config
 st.set_page_config(
-    page_title='Validator Dashboard',
+    page_title='Synapse Labs',
     menu_items={
-        'Report a bug': "https://github.com/opentensor/dashboards/issues",
+        'Report a bug': "https://github.com/steffencruz/join-me-william",
         'About': """
-        This dashboard is part of the OpenTensor project. \n
+        This dashboard is part of my earnest attempt to serenade William into joining me in building Synapse Labs.
         """
     },
     layout = "centered"
@@ -64,14 +64,13 @@ st.markdown('#')
 st.markdown('#')
 
 
+@st.cache_data()
+def load_data():
+    df = pd.read_csv('data/subnets/0/df.csv')
+    df.sort_values(by=['block','timestamp','netuid'], inplace=True)
 
-df = pd.read_csv('data/subnets/0/df.csv')
-df.sort_values(by=['block','timestamp','netuid'], inplace=True)
-blocks = df.block.unique()
-last_block = df.block.max()
+    return df
 
-# tau symbol
-tao = u"\u03C4"
 
 st.cache_data()
 def get_metagraph(netuid=0):
@@ -85,48 +84,6 @@ def get_metagraph(netuid=0):
 
         return FakeMetagraph()
 
-metagraph = get_metagraph()
-current_block = metagraph.block.item()
-
-# with st.sidebar:
-#     st.title('Options')
-#     st.markdown('#')
-
-#     netuid = st.selectbox('Netuid', [1,11], index=0)
-
-#     st.markdown('#')
-
-#     c1, c2 = st.columns([0.7,0.3])
-#     staleness =  current_block - last_block
-#     msg = c1.warning(f'Out of date ({staleness})') if staleness >= 100 else c1.info('Up to date')
-#     if c2.button('Update', type='primary'):
-#         msg.info('Downloading')
-#         return_code = run_subprocess()
-#         if return_code == 0:
-#             msg.success('Up to date')
-#             time.sleep(1)
-#             msg.empty()
-#         else:
-#             msg.error('Error')
-
-#     st.markdown('#')
-
-
-#     st.markdown('#')
-#     st.markdown('#')
-#     # horizontal line
-#     st.markdown('<hr>', unsafe_allow_html=True)
-
-#     r1c1, r1c2 = st.columns(2)
-#     x = r1c1.selectbox('**Time axis**', ['block','timestamp'], index=0)
-#     color = r1c2.selectbox('**Color**', ['coldkey','hotkey','ip'], index=0)
-#     r2c1, r2c2 = st.columns(2)
-#     ntop = r2c1.slider('**Sample top**', min_value=1, max_value=50, value=10, key='sel_ntop')
-#     opacity = r2c2.slider('**Opacity**', min_value=0., max_value=1., value=0.5, key='opacity')
-#     r3c1, r3c2 = st.columns(2)
-#     smooth = r3c1.slider('Smoothing', min_value=1, max_value=100, value=1, key='sel_churn_smooth')
-#     smooth_agg = r3c2.radio('Smooth Aggregation', ['mean','std','max','min','sum'], horizontal=True, index=0)
-
 def get_token_price():
     """Get tao price"""
     resp = requests.get('https://taostats.io')
@@ -135,7 +92,19 @@ def get_token_price():
     print(f'Live token price = USD${price:.2f}')
     return price
 
+# Get source data
+df = load_data()
+blocks = df.block.unique()
+last_block = df.block.max()
+
+# tau symbol
+tao = u"\u03C4"
+
+metagraph = get_metagraph()
+current_block = metagraph.block.item()
+
 token_price = get_token_price()
+
 
 tlmcol1, tlmcol2, tlmcol3 = st.columns(3)
 tlmcol1.metric(f'Token price: {tao}', f'${token_price:.2f}')
@@ -161,13 +130,13 @@ with tab1:
 
     st.subheader('Subnet Metrics')
 
-    ncol1, *_ = st.columns(3)
+    ncol1, ncol2 = st.columns([0.25, 0.75])
     netuid = ncol1.selectbox('Select a **subnet**', sorted(df.netuid.unique()), index=1)
     df_sn = df.loc[df.netuid==netuid]
     sn_emission = df_sn.Emission.values
     sn_owner_take = df_sn.owner_take.values
 
-    st.info(f'*Showing metrics for subnet* **{netuid}**')
+    ncol2.info(f'*Showing metrics for subnet* **{netuid}**')
 
     mcol1, mcol2, mcol3 = st.columns(3)
     mcol1.metric('Emission %', f'{sn_emission[-1]*100:.1f}', delta=f'{(sn_emission[-1]-sn_emission[-2])*100:.1f}')
@@ -212,7 +181,7 @@ with tab2:
     st.markdown('#')
     st.header('Validator Revenue')
     st.success('**Validators** *share 42% of subnet emissions, based on stake. Validators earn 18% tax on all delegated stake.*')
-    
+
     threshold = st.slider('Stake threshold', min_value=0, max_value=100_000, value=10_000, key='stake_threshold')
     st.plotly_chart(
         plotting.plot_validator_stake(pd.DataFrame({'stake':metagraph.stake}), threshold=threshold),
@@ -241,7 +210,7 @@ with tab4:
             We met in the :red[s]kies before we both flew the nest,
 
             then resumed our great vo:red[y]age in Pacific Northwest.
-            
+
             We've bee:red[n] through the strangest and nicest of times,
 
             Including knighting e:red[a]ch other with the finest of wines.
