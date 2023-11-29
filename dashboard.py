@@ -106,6 +106,8 @@ current_block = metagraph.block.item()
 
 token_price = get_token_price()
 
+df['owner_take_usd'] = df.owner_take * token_price
+
 
 tlmcol1, tlmcol2, tlmcol3 = st.columns(3)
 tlmcol1.metric(f'Token price: {tao}', f'${token_price:.2f}')
@@ -165,7 +167,8 @@ with tab1:
 
     y_mapping = {
         'Emissions': 'Emission',
-        'Earnings': 'owner_take'
+        'Earnings': 'owner_take',
+        'Earnings (US$)': 'owner_take_usd',
     }
 
     y = pcol2.selectbox('**Y axis**', list(y_mapping.keys()), index=1)
