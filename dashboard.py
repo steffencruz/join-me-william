@@ -197,6 +197,14 @@ with tab2:
         plotting.plot_validator_stake(pd.DataFrame({'stake':metagraph.stake}), threshold=threshold),
         use_container_width=True
     )
+    
+    scol1, scol2 = st.columns(2)
+    user_stake = scol1.slider('Validator stake', min_value=0, max_value=100_000, value=10_000, key='user_stake')
+    delegated_stake = scol2.slider('Delegated stake', min_value=0, max_value=1_000_000, value=100_000, key='delegated_stake')
+    st.plotly_chart(
+        plotting.plot_validator_earnings(pd.DataFrame({'delegated':metagraph.stake}), threshold=threshold, user_stake=user_stake, user_delegated=delegated_stake),
+        use_container_width=True
+    )    
 
 
 with tab3:
