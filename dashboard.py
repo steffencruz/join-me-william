@@ -165,7 +165,7 @@ with tab1:
         'Earnings': 'owner_take'
     }
 
-    y = pcol2.selectbox('**Y axis**', ['Earnings','Emission'], index=0)
+    y = pcol2.selectbox('**Y axis**', list(y_mapping.keys()), index=1)
     ntop = pcol3.slider('**Top Subnets**', min_value=1, max_value=32, value=5, key='sel_ntop')
 
     st.plotly_chart(
