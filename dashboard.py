@@ -131,6 +131,7 @@ with tab1:
     st.markdown('#')
 
     st.subheader('Subnet Metrics')
+    st.markdown('#')
 
     ncol1, ncol2 = st.columns([0.25, 0.75])
     netuid = ncol1.selectbox('Select a **subnet**', sorted(df.netuid.unique()), index=1)
@@ -144,6 +145,7 @@ with tab1:
     mcol1.metric('Emission %', f'{sn_emission[-1]*100:.1f}', delta=f'{(sn_emission[-1]-sn_emission[-2])*100:.1f}')
     mcol2.metric(f'Total earnings ({tao})', f'{tao}{sn_owner_take.sum():.2f}', delta=f'{tao}{sn_owner_take[-1]-sn_owner_take[-2]:.2f}')
     mcol3.metric(f'Total earnings (US$)', f'{tao}{sn_owner_take.sum()*token_price:,.2f}', delta=f'{tao}{(sn_owner_take[-1]-sn_owner_take[-2])*token_price:,.2f}')
+    st.markdown('#')
 
     with st.expander(f'View **raw** data for subnet {netuid}'):
         st.dataframe(df_sn)
