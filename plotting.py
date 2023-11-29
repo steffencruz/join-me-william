@@ -1,5 +1,8 @@
 import streamlit as st
 import plotly.express as px
+from PIL import Image
+
+
 
 @st.cache_data()
 def plot_owner_total_earnings(df, y='owner_take', color='day'):
@@ -21,3 +24,13 @@ def plot_owner_emission_trends(df, x='timestamp', y='owner_take', color='netuid'
                     labels={'netuid': 'Subnet', 'owner_take': 'Daily Owner Earnings (TAO)'},
                     width=800, height=600, template='plotly_white'
                     ).update_traces(opacity=0.7)
+
+@st.cache_data()
+def plot_validator_stake(stake, threshold=10000):
+    return px.pie(stake[stake>threshold], values='stake', hole=0.5,
+       title=f'Stake Distribution (Stake > {threshold:,} TAO)',
+       width=800, height=600, template='plotly_white')
+
+@st.cache_data()
+def plot_photo(path):
+    return Image.open(path)

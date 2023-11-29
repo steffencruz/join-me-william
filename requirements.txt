@@ -6,3 +6,4 @@ streamlit
 tqdm
 watchdog
 regex
+Pillow

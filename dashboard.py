@@ -81,6 +81,7 @@ def get_metagraph(netuid=0):
         class FakeMetagraph:
             def __init__(self):
                 self.block = torch.tensor(0)
+                self.stake = torch.tensor([1,1,1,1,1])
 
         return FakeMetagraph()
 
@@ -179,7 +180,7 @@ with tab1:
     st.markdown('#')
     st.markdown('#')
     st.markdown('#')
-    
+
     st.subheader('Subnet Earnings')
 
     pcol1, pcol2, pcol3 = st.columns(3)
@@ -210,43 +211,23 @@ with tab2:
     st.markdown('#')
     st.markdown('#')
     st.header('Validator Revenue')
-    st.success('**Validators** *earn 18% of nominator dividends*')
+    st.success('**Validators** *share 42% of subnet emissions, based on stake. Validators earn 18% tax on all delegated stake.*')
     
-    # mcol1, mcol2, mcol3 = st.columns(3)
-    # mcol2.metric('Emission %', f'{sn1_today.emission*100:.1f}', delta=f'{(sn1_today.emission-sn1_yesterday.emission)*100:.1f}')
-    # mcol3.metric('Earnings', f'{tao}{sn1.earnings.sum():.3f}', delta=f'{tao}{sn1_today.earnings-sn1_yesterday.earnings:.3f}')
+    threshold = st.slider('Stake threshold', min_value=0, max_value=100_000, value=10_000, key='stake_threshold')
+    st.plotly_chart(
+        plotting.plot_validator_stake(pd.DataFrame({'stake':metagraph.stake}), threshold=threshold),
+        use_container_width=True
+    )
 
-    # st.plotly_chart(
-    #     plotting.plot_animation(validators, x=vac_x, y=vac_y, color=vac_color, size=vac_size, opacity=opacity),
-    #     use_container_width=True
-    # )
-    # validator_choice = st.radio('Select:', validator_choices, horizontal=True, index=0)
-    # with st.expander(f'Show **{validator_choice}** trends for top **{ntop}** validators'):
-
-    #     st.plotly_chart(
-    #         plotting.plot_trace(validators, time_col=x,col=validator_choice, ntop=ntop, smooth=smooth, smooth_agg=smooth_agg, opacity=opacity),
-    #         use_container_width=True
-    #     )
-
-    # count_col = st.radio('Count', cabal_choices, index=0, horizontal=True, key='sel_validator_count')
-    # with st.expander(f'Show **{count_col}** trends for top **{ntop}** validators'):
-
-    #     st.plotly_chart(
-    #         plotting.plot_cabals(validators, time_col=x, count_col=count_col, sel_col=color, ntop=ntop, smooth=smooth, smooth_agg=smooth_agg, opacity=opacity),
-    #         use_container_width=True
-    #     )
 
 with tab3:
 
     st.markdown('#')
     st.markdown('#')
     st.subheader('Mining Revenue')
-    st.info('**Block introspection** *shows the complete metagraph of a block*')
+    st.success('**Miners** *share 42% of subnet emissions, based on performance*')
 
-    # selected_block = st.selectbox('**Block**', reversed(df_sel.block.unique()), index=0)
-
-    # st.dataframe(df_sel.loc[df_sel['block']==selected_block])
-
+    st.markdown('Coming soon!')
 
 
 ### Coda  ###
@@ -254,17 +235,24 @@ with tab4:
 
     st.markdown('#')
     st.markdown('#')
-    st.subheader('Introduction')
-    st.info('Our **lifelong friendship**')
-    st.text("""
-            We met the **s**kies before we both flew the nest,
-            then resumed our great journe**y** in Pacific Northwest.
-            We've bee**n** through the strangest and nicest of times,
-            Including knighting e**a**ch other with the finest of wines.
-            So much has ha**p**pened, so much has been said,
-            and now here we are, galaxies ahead.
-            We got on the train and we're going full **s**team,
-            so let's build the future and make it a dr**e**am :heart:
+    st.header('Our **lifelong friendship**')
+    # The way to add bold to st.text is to use **bold**.
+    st.markdown("""
+            We met in the :red[s]kies before we both flew the nest,
+
+            then resumed our great vo:red[y]age in Pacific Northwest.
+            
+            We've bee:red[n] through the strangest and nicest of times,
+
+            Including knighting e:red[a]ch other with the finest of wines.
+
+            So much has ha:red[p]pened, so much has been said,
+
+            and now here we are, galaxie:red[s] ahead.
+
+            We got on the train and we're going full st:red[e]am,
+
+            so let's build the future and make it a dream :heart:
             """)
 
     photo_choices = {
@@ -274,11 +262,11 @@ with tab4:
         'chess': 'data/photos/chess.jpg',
         'strange': 'data/photos/strange.jpeg'
     }
-    photo_choice = st.radio('Times', ['good','bad','nice','chess','strange'], horizontal=True, index=0)
+    photo_choice = st.radio('Choose a time:', ['good', 'nice','chess','strange','spooky'], horizontal=True, index=0)
 
     # display image
-    st.image(photo_choice[photo_choice], use_column_width=True)
+    st.image(plotting.plot_photo(photo_choices[photo_choice]), use_column_width=True)
 
-    if st.button('Join..?', type='primary'):
+    if st.button('Join synapse labs..?', type='primary'):
         st.balloons()
         st.success('Nice time! :heart:')
