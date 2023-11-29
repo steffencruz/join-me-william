@@ -14,13 +14,13 @@ def plot_owner_total_earnings(df, y='owner_take', color='day'):
 
 
 @st.cache_data()
-def plot_owner_emission_trends(df, x='timestamp', y='owner_take', color='netuid', ntop=32):
+def plot_owner_emission_trends(df, x='timestamp', y='owner_take', label=None, color='netuid', ntop=32):
 
     top_netuids = df.groupby('netuid')['owner_take'].sum().sort_values(ascending=False).index[:ntop]
 
     return px.line(df.loc[df.netuid.isin(top_netuids)], x=x, y=y, color=color,
                    line_group='netuid',
-                    title=f'Earnings Trends for Top {ntop} Subnets',
+                    title=f'{label or y} Trends for Top {ntop} Subnets',
                     labels={'netuid': 'Subnet', 'owner_take': 'Daily Owner Earnings (TAO)'},
                     width=800, height=600, template='plotly_white'
                     ).update_traces(opacity=0.7)

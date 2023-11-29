@@ -169,7 +169,7 @@ with tab1:
     ntop = pcol3.slider('**Top Subnets**', min_value=1, max_value=32, value=5, key='sel_ntop')
 
     st.plotly_chart(
-        plotting.plot_owner_emission_trends(df, x=x, y=y_mapping[y], color='netuid', ntop=ntop),
+        plotting.plot_owner_emission_trends(df, x=x, y=y_mapping[y], label=y, color='netuid', ntop=ntop),
         use_container_width=True
     )
 
