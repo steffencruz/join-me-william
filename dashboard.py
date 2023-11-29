@@ -67,6 +67,7 @@ st.markdown('#')
 @st.cache_data()
 def load_data():
     df = pd.read_csv('data/subnets/0/df.csv')
+    df['timestamp'] = pd.to_datetime(df.timestamp)
     df.sort_values(by=['block','timestamp','netuid'], inplace=True)
 
     return df
@@ -138,8 +139,10 @@ with tab1:
     df_sn = df.loc[df.netuid==netuid]
     sn_emission = df_sn.Emission.values
     sn_owner_take = df_sn.owner_take.values
+    st.markdown('#')
 
-    ncol2.markdown(f'*Showing metrics for subnet* **{netuid}** between {df_sn.timestamp.min().round("1d")} and {df_sn.timestamp.max().round("1d")}*')
+    ncol2.markdown(f'*Showing metrics for subnet* **{netuid}** between {df_sn.timestamp.min().strftime("%d %b")} and {df_sn.timestamp.max().strftime("%d %b")}')
+    st.markdown('#')
 
     mcol1, mcol2, mcol3 = st.columns(3)
     mcol1.metric('Emission %', f'{sn_emission[-1]*100:.1f}', delta=f'{(sn_emission[-1]-sn_emission[-2])*100:.1f}')
