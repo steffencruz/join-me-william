@@ -139,7 +139,7 @@ with tab1:
     sn_emission = df_sn.Emission.values
     sn_owner_take = df_sn.owner_take.values
 
-    ncol2.info(f'*Showing metrics for subnet* **{netuid}**')
+    ncol2.markdown(f'*Showing metrics for subnet* **{netuid}**')
 
     mcol1, mcol2, mcol3 = st.columns(3)
     mcol1.metric('Emission %', f'{sn_emission[-1]*100:.1f}', delta=f'{(sn_emission[-1]-sn_emission[-2])*100:.1f}')
@@ -166,7 +166,7 @@ with tab1:
     }
 
     y = pcol2.selectbox('**Y axis**', ['Earnings','Emission'], index=0)
-    ntop = pcol3.slider('**Top Subnets**', min_value=1, max_value=32, value=32, key='sel_ntop')
+    ntop = pcol3.slider('**Top Subnets**', min_value=1, max_value=32, value=5, key='sel_ntop')
 
     st.plotly_chart(
         plotting.plot_owner_emission_trends(df, x=x, y=y_mapping[y], color='netuid', ntop=ntop),
