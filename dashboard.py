@@ -143,13 +143,13 @@ with tab1:
     sn_owner_take = df_sn.owner_take.values
     st.markdown('#')
 
-    ncol2.markdown(f'*Showing metrics for subnet* **{netuid}** between {df_sn.timestamp.min().strftime("%d %b")} and {df_sn.timestamp.max().strftime("%d %b")}')
+    ncol2.markdown(f'*Showing metrics for subnet* **{netuid}** *between* **{df_sn.timestamp.min().strftime("%d %b")}** *and* **{df_sn.timestamp.max().strftime("%d %b")}**')
     st.markdown('#')
 
     mcol1, mcol2, mcol3 = st.columns(3)
     mcol1.metric('Emission %', f'{sn_emission[-1]*100:.1f}', delta=f'{(sn_emission[-1]-sn_emission[-2])*100:.1f}')
-    mcol2.metric(f'Total earnings ({tao})', f'{tao}{sn_owner_take.sum():.2f}', delta=f'{tao}{sn_owner_take[-1]-sn_owner_take[-2]:.2f}')
-    mcol3.metric(f'Total earnings (US$)', f'{tao}{sn_owner_take.sum()*token_price:,.2f}', delta=f'{tao}{(sn_owner_take[-1]-sn_owner_take[-2])*token_price:,.2f}')
+    mcol2.metric(f'Total earnings ({tao})', f'{tao}{sn_owner_take.sum():,.2f}', delta=f'{tao}{sn_owner_take[-1]:,.2f}')
+    mcol3.metric(f'Total earnings (US$)', f'{tao}{sn_owner_take.sum()*token_price:,.2f}', delta=f'{tao}{sn_owner_take[-1]*token_price:,.2f}')
     st.markdown('#')
 
     with st.expander(f'View **raw** data for subnet {netuid}'):

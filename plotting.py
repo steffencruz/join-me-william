@@ -8,11 +8,13 @@ labels={'netuid': 'Subnet', 'Emission':'Emission (%)', 'owner_take': 'Daily Owne
 
 @st.cache_data()
 def plot_owner_total_earnings(df, y='owner_take', color='day', title=None):
-    return px.bar(df, x='netuid', y=y, color=color, barmode='group',
-            color_continuous_scale='BlueRed',
-            title=f'Total {title or y} per Subnet',
-            labels=labels,
-            width=800, height=600, template='plotly_white')
+    return px.bar(df, x='netuid', y=y, 
+                  color=color, barmode='group',opacity=0.7,
+                  hover_data=['timestamp','block','owner_take','owner_take_usd','Emission'],
+                    color_continuous_scale='BlueRed',
+                    title=f'Total {title or y} per Subnet',
+                    labels=labels,
+                    width=800, height=600, template='plotly_white')
 
 
 @st.cache_data()
@@ -21,7 +23,7 @@ def plot_owner_emission_trends(df, x='timestamp', y='owner_take', label=None, co
     top_netuids = df.groupby('netuid')[y].sum().sort_values(ascending=False).index[:ntop]
 
     return px.line(df.loc[df.netuid.isin(top_netuids)], x=x, y=y, color=color,
-                   line_group='netuid',
+                   line_group='netuid', hover_data=['timestamp','block','owner_take','owner_take_usd','Emission'],
                     title=f'{label or y} Trends for Top {ntop} Subnets',
                     labels=labels,
                     width=800, height=600, template='plotly_white'
